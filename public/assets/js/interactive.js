@@ -657,38 +657,6 @@ window.magnifyView = () => {
     if (_pm.mobile) controls.enabled = !magnify.enabled;
 };
 window.loadProgram = async (d) => {
-    _pm.model.culling = (d) => {
-        if (!register.busy.culling.now || register.busy.culling.now + 2048 < performance.now()) {
-            register.busy.culling.now = performance.now();
-            for (let k in register.busy.culling.meshes) {
-                d.m = scene.getObjectByName(k);
-                d.uD = d.m.userData;
-                if (!d.uD.cBusy && (!d.uD.cLastPos || d.uD.cLastPos && d.pos.distanceTo(d.uD.cLastPos) > d.uD.culling.range / 5)) {
-                    d.uD.cBusy = true;
-                    d.uD.cLastPos = d.pos;
-                    if (!d.m.userData.originalGeometry)
-                        d.m.userData.originalGeometry = d.m.geometry.clone();
-                    d.geo = d.m.geometry !== d.m.userData.originalGeometry
-                        ? d.m.userData.originalGeometry.clone()
-                        : d.m.geometry.clone();
-                    d.pos.copy(camera.position);
-                    _pm.model.nearMesh({
-                        geo: {
-                            position: d.geo.attributes.position.array,
-                            index: d.geo.index ? d.geo.index.array : null,
-                            uv: d.geo.attributes.uv ? d.geo.attributes.uv.array : null,
-                            groups: d.geo.groups
-                        },
-                        pos: d.pos,
-                        range: d.m.userData.culling.range,
-                        uuid: k
-                    });
-                    d.geo.dispose();
-                    d.geo = null
-                }
-            }
-        }
-    }
     if (_pm.p.stats && !stats) {
         stats = new Stats();
         stats.domElement.style.transformOrigin = "top left";
