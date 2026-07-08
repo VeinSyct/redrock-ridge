@@ -25,6 +25,8 @@ https://youtu.be/xipszTTazMo
 
 # 🌍 A Living Virtual Destination
 
+<img width="1709" height="920" alt="da6fabe1-a09f-4b5e-80d3-c31f80cc3c39" src="https://github.com/user-attachments/assets/ce1cda7a-56fb-4253-99b2-0b9fcecc896c" />
+
 Redrock Ridge is designed to be a place people genuinely want to visit.
 
 Rather than existing as disconnected scenes or isolated models, every location belongs to one seamless open world.
