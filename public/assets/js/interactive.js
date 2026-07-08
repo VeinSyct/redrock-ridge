@@ -1182,7 +1182,7 @@ window.rendererEvent = (event) => {
         if (register.physics) controls.enableDamping = true;
         setTimeout(() => {
             _pm.model.optimizeAssets({});
-            _pm.worker.aiPhysics && _pm.worker.aiPhysics.operation.postMessage({ action: "camera-update", position: camera.position });
+            _pm.model.culling({});
         }, 1024);
     }
     if (event.type.match(/(touchstart)/)) {
@@ -1574,7 +1574,7 @@ window.loadModelCompleted = (url, loaded, total) => {
                     if (register.invideos)
                         delete register.invideos.loaded;
                 }, 96);
-                _pm.worker.aiPhysics && _pm.worker.aiPhysics.operation.postMessage({ action: "camera-update", position: camera.position });
+                _pm.model.culling({});
                 showCenterIcon({ display: "none" });
         }
         if (postProcessing) onWindowResize({});
@@ -1866,29 +1866,13 @@ window.processGLTF = (d, gltf) => {
             if (child.material && child.material.name.match(/(lamp|signal)/))
                 gltf.scene.userData[child.material.name] = child.material;
             if (child.name.match(/(phy-body-dynamic)/)) {
-                child.updateMatrixWorld(true);
-                d.sc = new THREE.Vector3();
-                child.getWorldScale(d.sc);
-                child.geometry.applyMatrix4(new THREE.Matrix4().makeScale(d.sc.x, d.sc.y, d.sc.z));
-                child.scale.set(1, 1, 1);
-                child.getWorldQuaternion(new THREE.Quaternion());
-                child.getWorldPosition(new THREE.Vector3());
-                child.updateMatrix();
-                child.geometry.applyMatrix4(child.matrixWorld);
+                child = _pm.model.setGeometry({ m: child, sc: new THREE.Vector3() });
                 loader.collider.geometries[`${d.index}-${(Math.random() + 1).toString(36).substring(7)}`] = { geo: child.geometry.clone() };
                 d.l = true;
                 d.rc.push(child);
             } else {
-                if (child.userData.culling) {
-                    child.updateMatrixWorld(true);
-                    child.geometry.applyMatrix4(child.matrixWorld);
-                    child.position.set(0, 0, 0);
-                    child.rotation.set(0, 0, 0);
-                    child.scale.set(1, 1, 1);
-                    child.updateMatrix();
-                    child.name = `${child.name}-${(Math.random() + 1).toString(36).substring(7)}`;
-                    register.busy.culling.meshes[child.name] = child
-                }
+                if (child.userData.culling)
+                    child = _pm.model.setGeometry({ m: child });
                 if (child.name.match(/(phy-body-main|phy-body-part|phy-body-vehicle)/)) {
                     d.type = child.name
                         .replace(/phy-body-main-|phy-body-part-|phy-body-vehicle-/g, "")
@@ -2192,7 +2176,7 @@ window.render = async (now) => {
                         register.animation.error =  true;
                         register.error = Object.assign((register.error || {}), { modal: document.querySelector(".error-modal") });
                         register.error.modal.innerHTML = `
-                            <div class="error-modal-icon">⚠️</div>
+                            <div class="error-modal-icon">&#9888;</div>
                             <div class="error-modal-title">
                                 Oops...
                             </div>
@@ -2215,7 +2199,7 @@ window.render = async (now) => {
                 if (_pm.p.dynamic && _pm.p.dynamic.videoTextures)
                     isAnimatedVisible({ animated: register.animated.models, find: _pm.p.dynamic.videoTextures });
                 _pm.model.optimizeAssets({});
-                _pm.worker.aiPhysics && _pm.worker.aiPhysics.operation.postMessage({ action: "camera-update", position: camera.position });
+                _pm.model.culling({});
             }
         growLens({});
         if (stats)
