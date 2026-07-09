@@ -2164,7 +2164,7 @@ window.render = async (now) => {
                     if (!postProcessing) 
                         await renderer[`render${_pm.useWebGPU ? "Async" : ""}`](scene, camera);
                     else postProcessing.render();
-                    if (_pm.physics)
+                    if (_pm.physics && _pm.p.avatar && _pm.p.avatar.isAvatarOrVehicle[_pm.user.uid])
                         await _pm.physics.miniMap({});
                     if (register.animation.error) {
                         delete register.animation.error;
